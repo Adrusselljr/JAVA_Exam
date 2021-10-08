@@ -31,7 +31,7 @@ public class UsersController {
     
     @RequestMapping("")
     public String home() {
-    	return "home.jsp";
+        return "home.jsp";
     }
     
     @RequestMapping("/registration")
@@ -45,9 +45,9 @@ public class UsersController {
     
     @RequestMapping(value="/registration", method=RequestMethod.POST)
     public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, HttpSession session) {
-    	userValidator.validate(user, result);
+        userValidator.validate(user, result);
         if(result.hasErrors()) {
-        	return "registrationPage.jsp";
+            return "registrationPage.jsp";
         }
         User u = userService.registerUser(user);
         session.setAttribute("userId", u.getId());
@@ -58,13 +58,13 @@ public class UsersController {
     public String loginUser(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
         boolean isAuthenticated = userService.authenticateUser(email, password);
         if(isAuthenticated) {
-        	User u = userService.findByEmail(email);
-        	session.setAttribute("userId", u.getId());
-        	return "redirect:/ideas";
+            User u = userService.findByEmail(email);
+            session.setAttribute("userId", u.getId());
+            return "redirect:/ideas";
         }
         else {
-        	model.addAttribute("error", "Invalid Credentials.  Please try again.");
-        	return "loginPage.jsp";
+            model.addAttribute("error", "Invalid Credentials.  Please try again.");
+            return "loginPage.jsp";
         }
     }
     
@@ -87,20 +87,20 @@ public class UsersController {
     
     @GetMapping("/ideas/new")
     public String newIdea(@ModelAttribute("idea") Idea idea, Model model) {
-    	model.addAttribute("allUsers", this.userService.findAllUsers());
-    	return "newIdea.jsp";
+        model.addAttribute("allUsers", this.userService.findAllUsers());
+        return "newIdea.jsp";
     }
     
     @PostMapping("/ideas/create")
     public String createIdea(@Valid @ModelAttribute("idea") Idea idea, BindingResult result, Model model, HttpSession session) {
-    	if (result.hasErrors()) {
-    		model.addAttribute("allUsers", this.userService.findAllUsers());
+        if (result.hasErrors()) {
+            model.addAttribute("allUsers", this.userService.findAllUsers());
             return "newIdea.jsp";
         }
-    	else {
-    		Long userId = (Long) session.getAttribute("userId");
-        	User loggedInUser = userService.findUserById(userId);
-        	idea.setCreator(loggedInUser);
+        else {
+            Long userId = (Long) session.getAttribute("userId");
+            User loggedInUser = userService.findUserById(userId);
+            idea.setCreator(loggedInUser);
             this.userService.createIdea(idea);
             return "redirect:/ideas";
         }
@@ -108,66 +108,66 @@ public class UsersController {
     
     @GetMapping(value="/ideas/{id}")
     public String showIdea(@PathVariable("id") Long id, Model model, HttpSession session) {
-    	Long loggedInUserId = (Long) session.getAttribute("userId");
-    	User loggedInUser = userService.findUserById(loggedInUserId);
-    	model.addAttribute("loggedInUser", loggedInUser);
-    	model.addAttribute("ideaToShow", this.userService.findAnIdea(id));
-    	return "showIdea.jsp";
+        Long loggedInUserId = (Long) session.getAttribute("userId");
+        User loggedInUser = userService.findUserById(loggedInUserId);
+        model.addAttribute("loggedInUser", loggedInUser);
+        model.addAttribute("ideaToShow", this.userService.findAnIdea(id));
+        return "showIdea.jsp";
     }
     
     @GetMapping("/edit/{id}")
     public String editIdea(@PathVariable("id") Long id, Model model) {
-    	model.addAttribute("idea", this.userService.findAnIdea(id));
-    	model.addAttribute("allUsers", this.userService.findAllUsers());
-    	return "editIdea.jsp";
+        model.addAttribute("idea", this.userService.findAnIdea(id));
+        model.addAttribute("allUsers", this.userService.findAllUsers());
+        return "editIdea.jsp";
     }
     
     @PostMapping("/idea/update/{id}")
     public String updateIdea(@PathVariable("id") Long id, @Valid @ModelAttribute("idea") Idea idea, BindingResult result, Model model, HttpSession session) {
-    	if (result.hasErrors()) {
-    		model.addAttribute("allUsers", this.userService.findAllUsers());
-    		return "editIdea.jsp";
-    	}
+        if (result.hasErrors()) {
+            model.addAttribute("allUsers", this.userService.findAllUsers());
+            return "editIdea.jsp";
+        }
 		Idea i = this.userService.findAnIdea(id);
 		idea.setLikes(i.getLikes());
 		Long loggedInUserId = (Long) session.getAttribute("userId");
-    	User loggedInUser = userService.findUserById(loggedInUserId);
-    	idea.setCreator(loggedInUser);
-    	this.userService.updateIdea(idea);
-    	return "redirect:/ideas";
+        User loggedInUser = userService.findUserById(loggedInUserId);
+        idea.setCreator(loggedInUser);
+        this.userService.updateIdea(idea);
+        return "redirect:/ideas";
     }
     
     @GetMapping("/delete/{id}")
     public String deleteIdea(@PathVariable("id") Long id) {
-    	Idea idea = this.userService.findAnIdea(id);
-    	this.userService.deleteIdea(idea);
-    	return "redirect:/ideas";
+        Idea idea = this.userService.findAnIdea(id);
+        this.userService.deleteIdea(idea);
+        return "redirect:/ideas";
     }
     
     @GetMapping("/like/{id}")
     public String likeIdea(@PathVariable("id") Long id, HttpSession session) {
-    	Idea i = this.userService.findAnIdea(id);
-    	Long loggedInUserId = (Long) session.getAttribute("userId");
-    	User loggedInUser = userService.findUserById(loggedInUserId);
-    	if (i.getLikes().contains(loggedInUser)) {
-    		return "redirect:/ideas";
-    	}
+        Idea i = this.userService.findAnIdea(id);
+        Long loggedInUserId = (Long) session.getAttribute("userId");
+        User loggedInUser = userService.findUserById(loggedInUserId);
+        if (i.getLikes().contains(loggedInUser)) {
+            return "redirect:/ideas";
+        }
 		UserIdeaLikes userIdea = new UserIdeaLikes(loggedInUser, i);
-    	this.userService.createAssociation(userIdea);
-    	return "redirect:/ideas";
+        this.userService.createAssociation(userIdea);
+        return "redirect:/ideas";
     }
     
     @GetMapping("/unlike/{id}")
     public String unlikeIdea(@PathVariable("id") Long id, HttpSession session) {
-    	Idea i = this.userService.findAnIdea(id);
-    	Long loggedInUserId = (Long) session.getAttribute("userId");
-    	User loggedInUser = userService.findUserById(loggedInUserId);
-    	if (!i.getLikes().contains(loggedInUser)) {
-    		return "redirect:/ideas";
-    	}
-    	loggedInUser.getIdeasLiked().remove(i);
-    	this.userService.unlikeIdea(loggedInUser);
-    	return "redirect:/ideas";
+        Idea i = this.userService.findAnIdea(id);
+        Long loggedInUserId = (Long) session.getAttribute("userId");
+        User loggedInUser = userService.findUserById(loggedInUserId);
+        if (!i.getLikes().contains(loggedInUser)) {
+            return "redirect:/ideas";
+        }
+        loggedInUser.getIdeasLiked().remove(i);
+        this.userService.unlikeIdea(loggedInUser);
+        return "redirect:/ideas";
     }
 
 }

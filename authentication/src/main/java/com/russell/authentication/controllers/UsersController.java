@@ -26,7 +26,7 @@ public class UsersController {
     
     @RequestMapping("")
     public String home() {
-    	return "home.jsp";
+        return "home.jsp";
     }
     
     @RequestMapping("/registration")
@@ -40,9 +40,9 @@ public class UsersController {
     
     @RequestMapping(value="/registration", method=RequestMethod.POST)
     public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, HttpSession session) {
-    	userValidator.validate(user, result);
+        userValidator.validate(user, result);
         if(result.hasErrors()) {
-        	return "registrationPage.jsp";
+            return "registrationPage.jsp";
         }
         User u = userService.registerUser(user);
         session.setAttribute("userId", u.getId());
@@ -53,13 +53,13 @@ public class UsersController {
     public String loginUser(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
         boolean isAuthenticated = userService.authenticateUser(email, password);
         if(isAuthenticated) {
-        	User u = userService.findByEmail(email);
-        	session.setAttribute("userId", u.getId());
-        	return "redirect:/home";
+            User u = userService.findByEmail(email);
+            session.setAttribute("userId", u.getId());
+            return "redirect:/home";
         }
         else {
-        	model.addAttribute("error", "Invalid Credentials.  Please try again.");
-        	return "loginPage.jsp";
+            model.addAttribute("error", "Invalid Credentials.  Please try again.");
+            return "loginPage.jsp";
         }
     }
     
